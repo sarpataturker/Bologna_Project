@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const DersAtama = () => {
   const [dersler, setDersler] = useState([]);
@@ -7,12 +8,17 @@ const DersAtama = () => {
   const [selectedDers, setSelectedDers] = useState('');
   const [selectedHoca, setSelectedHoca] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchDersler();
-    fetchHocalar();
-  }, []);
+    const role = localStorage.getItem('role');
+    if (role !== 'idareci') {
+      navigate('/'); // İdareci değilse anasayfaya yönlendir
+    } else {
+      fetchDersler();
+      fetchHocalar();
+    }
+  }, [navigate]);
 
   const fetchDersler = async () => {
     try {
@@ -43,14 +49,13 @@ const DersAtama = () => {
   const handleAtaClick = async () => {
     try {
       const response = await axios.post('http://localhost:5001/api/ata', { dersId: selectedDers, hocaId: selectedHoca });
-      setSuccessMessage(response.data.message);
+      console.log(response.data.message);
       setErrorMessage('');
       fetchDersler();
       fetchHocalar();
     } catch (error) {
       console.error('Ders atama hatası:', error.response.data.message);
       setErrorMessage(error.response.data.message);
-      setSuccessMessage('');
     }
   };
 
@@ -58,7 +63,6 @@ const DersAtama = () => {
     <div>
       <h2>Ders Atama</h2>
       {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
-      {successMessage && <div style={{ color: 'green' }}>{successMessage}</div>}
       <div>
         <h3>Ders Seç:</h3>
         <select onChange={handleDersChange} value={selectedDers}>

@@ -5,18 +5,26 @@ import axios from 'axios';
 const Login = () => {
   const [tc, setTc] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:5001/login', { tc, password });
-      const { token } = response.data;
+      const { token, role } = response.data;
       localStorage.setItem('token', token);
-      navigate('/ders-atama');
+      localStorage.setItem('role', role);
+
+      if (role === 'idareci') {
+        navigate('/ders-atama');
+      } else if (role === 'hoca') {
+        navigate('/ders-icerigi');
+      } else {
+        navigate('/');
+      }
     } catch (error) {
-      console.error('Login error:', error);
-      alert('Login failed: ' + (error.response?.data?.message || error.message));
+      setError('Giriş hatası: Lütfen bilgilerinizi kontrol edin.');
     }
   };
 
@@ -28,6 +36,7 @@ const Login = () => {
           type="text"
           value={tc}
           onChange={(e) => setTc(e.target.value)}
+          required
         />
       </div>
       <div>
@@ -36,8 +45,10 @@ const Login = () => {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
       </div>
+      {error && <div style={{ color: 'red' }}>{error}</div>}
       <button type="submit">Login</button>
     </form>
   );
