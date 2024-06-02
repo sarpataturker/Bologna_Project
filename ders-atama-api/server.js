@@ -169,6 +169,57 @@ Promise.all([loadUsers(), loadDersler(), loadHocalar()])
         });
     });
 
+    app.get('/api/icerik', (req, res) => {
+      const icerikFilePath = path.join(__dirname, 'data', 'icerik.csv');
+      const icerikler = [];
+    
+      fs.createReadStream(icerikFilePath)
+        .pipe(csv({ headers: ['dersId', 'icerik'], skipLines: 1 }))
+        .on('data', (row) => {
+          icerikler.push(row);
+        })
+        .on('end', () => {
+          res.json(icerikler);
+        })
+        .on('error', (err) => {
+          res.status(500).json({ message: 'İçerikler alınırken bir hata oluştu.' });
+        });
+    });
+
+    app.get('/api/kitap', (req, res) => {
+      const kitapFilePath = path.join(__dirname, 'data', 'kitap.csv');
+      const kitaplar = [];
+    
+      fs.createReadStream(kitapFilePath)
+        .pipe(csv({ headers: ['dersId', 'kitap'], skipLines: 1 }))
+        .on('data', (row) => {
+          kitaplar.push(row);
+        })
+        .on('end', () => {
+          res.json(kitaplar);
+        })
+        .on('error', (err) => {
+          res.status(500).json({ message: 'Kaynak kitaplar alınırken bir hata oluştu.' });
+        });
+    });
+
+    app.get('/api/cikti', (req, res) => {
+      const ciktiFilePath = path.join(__dirname, 'data', 'cikti.csv');
+      const ciktilar = [];
+    
+      fs.createReadStream(ciktiFilePath)
+        .pipe(csv({ headers: ['dersId', 'cikti'], skipLines: 1 }))
+        .on('data', (row) => {
+          ciktilar.push(row);
+        })
+        .on('end', () => {
+          res.json(ciktilar);
+        })
+        .on('error', (err) => {
+          res.status(500).json({ message: 'Öğrenim çıktıları alınırken bir hata oluştu.' });
+        });
+    });
+
     app.listen(port, () => {
       console.log(`Server http://localhost:${port} adresinde çalışıyor`);
     });

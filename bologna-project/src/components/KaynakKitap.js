@@ -1,24 +1,24 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const DersIcerigi = () => {
+const KaynakKitap = () => {
   const [dersId, setDersId] = useState('');
-  const [icerik, setIcerik] = useState('');
+  const [kitap, setKitap] = useState('');
   const [message, setMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5001/api/icerik', { dersId, icerik });
-      setMessage('İçerik başarıyla eklendi');
+      await axios.post('http://localhost:5001/api/kitap', { dersId, kitap });
+      setMessage('Kaynak kitap başarıyla eklendi');
     } catch (error) {
-      setMessage('İçerik eklenirken bir hata oluştu');
+      setMessage('Kaynak kitap eklenirken bir hata oluştu');
     }
   };
 
   return (
     <div>
-      <h2>Ders İçeriği Ekle</h2>
+      <h2>Kaynak Kitap Ekle</h2>
       <form onSubmit={handleSubmit}>
         <div>
           <label>Ders ID:</label>
@@ -29,11 +29,11 @@ const DersIcerigi = () => {
           />
         </div>
         <div>
-          <label>İçerik:</label>
+          <label>Kaynak Kitap:</label>
           <input
             type="text"
-            value={icerik}
-            onChange={(e) => setIcerik(e.target.value)}
+            value={kitap}
+            onChange={(e) => setKitap(e.target.value)}
           />
         </div>
         <button type="submit">Ekle</button>
@@ -43,4 +43,4 @@ const DersIcerigi = () => {
   );
 };
 
-export default DersIcerigi;
+export default KaynakKitap;

@@ -5,7 +5,6 @@ import axios from 'axios';
 const Login = () => {
   const [tc, setTc] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -13,18 +12,15 @@ const Login = () => {
     try {
       const response = await axios.post('http://localhost:5001/login', { tc, password });
       const { token, role } = response.data;
-      localStorage.setItem('token', token);
-      localStorage.setItem('role', role);
-
+      localStorage.setItem('token', token); // Tokeni localStorage'e sakla
+      localStorage.setItem('role', role); // Rolü localStorage'e sakla
       if (role === 'idareci') {
-        navigate('/ders-atama');
+        navigate('/ders-atama'); // İdareci ise DersAtama sayfasına yönlendir
       } else if (role === 'hoca') {
-        navigate('/ders-icerigi');
-      } else {
-        navigate('/');
+        navigate('/ders-icerigi'); // Öğretim elemanı ise DersIcerigi sayfasına yönlendir
       }
     } catch (error) {
-      setError('Giriş hatası: Lütfen bilgilerinizi kontrol edin.');
+      console.error('Login error:', error);
     }
   };
 
@@ -36,7 +32,6 @@ const Login = () => {
           type="text"
           value={tc}
           onChange={(e) => setTc(e.target.value)}
-          required
         />
       </div>
       <div>
@@ -45,10 +40,8 @@ const Login = () => {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          required
         />
       </div>
-      {error && <div style={{ color: 'red' }}>{error}</div>}
       <button type="submit">Login</button>
     </form>
   );
