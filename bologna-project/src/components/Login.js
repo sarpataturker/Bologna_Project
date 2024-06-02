@@ -12,11 +12,11 @@ const Login = () => {
     try {
       const response = await axios.post('http://localhost:5001/login', { tc, password });
       const { token } = response.data;
-      localStorage.setItem('token', token); // Tokeni localStorage'e sakla
-      navigate('/ders-atama'); // Başarılı login durumunda DersAtama sayfasına yönlendir
+      localStorage.setItem('token', token);
+      navigate('/ders-atama');
     } catch (error) {
       console.error('Login error:', error);
-      // İleride kullanıcıya uygun bir hata mesajı gösterilebilir
+      alert('Login failed: ' + (error.response?.data?.message || error.message));
     }
   };
 
@@ -28,7 +28,6 @@ const Login = () => {
           type="text"
           value={tc}
           onChange={(e) => setTc(e.target.value)}
-          required // TC alanı zorunlu
         />
       </div>
       <div>
@@ -37,7 +36,6 @@ const Login = () => {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          required // Parola alanı zorunlu
         />
       </div>
       <button type="submit">Login</button>

@@ -7,6 +7,7 @@ const DersAtama = () => {
   const [selectedDers, setSelectedDers] = useState('');
   const [selectedHoca, setSelectedHoca] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     fetchDersler();
@@ -42,13 +43,14 @@ const DersAtama = () => {
   const handleAtaClick = async () => {
     try {
       const response = await axios.post('http://localhost:5001/api/ata', { dersId: selectedDers, hocaId: selectedHoca });
-      console.log(response.data.message);
+      setSuccessMessage(response.data.message);
       setErrorMessage('');
-      fetchDersler(); // Atama yapıldıktan sonra dersler ve hocaların yeniden yüklenmesi
+      fetchDersler();
       fetchHocalar();
     } catch (error) {
       console.error('Ders atama hatası:', error.response.data.message);
       setErrorMessage(error.response.data.message);
+      setSuccessMessage('');
     }
   };
 
@@ -56,6 +58,7 @@ const DersAtama = () => {
     <div>
       <h2>Ders Atama</h2>
       {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
+      {successMessage && <div style={{ color: 'green' }}>{successMessage}</div>}
       <div>
         <h3>Ders Seç:</h3>
         <select onChange={handleDersChange} value={selectedDers}>

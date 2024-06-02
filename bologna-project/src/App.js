@@ -5,6 +5,7 @@ import Login from './components/Login';
 import DersAtama from './components/DersAtama';
 import DersIcerigi from './components/DersIcerigi';
 import Header from './components/Header';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
   return (
@@ -13,8 +14,8 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/ders-atama" element={<DersAtama />} />
-        <Route path="/ders-icerigi" element={<DersIcerigi />} />
+        <Route path="/ders-atama" element={<ProtectedRoute><DersAtama /></ProtectedRoute>} />
+        <Route path="/ders-icerigi" element={<ProtectedRoute><DersIcerigi /></ProtectedRoute>} />
       </Routes>
     </Router>
   );

@@ -3,13 +3,9 @@ import axios from 'axios';
 
 const Home = () => {
   const [assignments, setAssignments] = useState([]);
-  const [dersler, setDersler] = useState([]);
-  const [hocalar, setHocalar] = useState([]);
 
   useEffect(() => {
     fetchAssignments();
-    fetchDersler();
-    fetchHocalar();
   }, []);
 
   const fetchAssignments = async () => {
@@ -19,34 +15,6 @@ const Home = () => {
     } catch (error) {
       console.error('Atamalar yüklenemedi:', error);
     }
-  };
-
-  const fetchDersler = async () => {
-    try {
-      const response = await axios.get('http://localhost:5001/api/dersler');
-      setDersler(response.data);
-    } catch (error) {
-      console.error('Dersler yüklenemedi:', error);
-    }
-  };
-
-  const fetchHocalar = async () => {
-    try {
-      const response = await axios.get('http://localhost:5001/api/hocalar');
-      setHocalar(response.data);
-    } catch (error) {
-      console.error('Hocalar yüklenemedi:', error);
-    }
-  };
-
-  const getDersName = (dersId) => {
-    const ders = dersler.find(ders => ders.ders_id.toString() === dersId);
-    return ders ? ders.name : 'Bilinmiyor';
-  };
-
-  const getHocaName = (hocaId) => {
-    const hoca = hocalar.find(hoca => hoca.hoca_id.toString() === hocaId);
-    return hoca ? hoca.name : 'Bilinmiyor';
   };
 
   return (
