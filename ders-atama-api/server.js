@@ -2,9 +2,9 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const csv = require('csv-parser');
-const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
 const app = express();
@@ -13,7 +13,6 @@ const port = 5001;
 app.use(cors());
 app.use(bodyParser.json());
 
-// Kullanıcıları CSV dosyasından yükleme
 const loadUsers = () => {
   return new Promise((resolve, reject) => {
     const users = [];
@@ -24,17 +23,14 @@ const loadUsers = () => {
         users.push(row);
       })
       .on('end', () => {
-        console.log('Users CSV file successfully processed');
         resolve(users);
       })
       .on('error', (err) => {
-        console.error('Error processing Users CSV file:', err);
         reject(err);
       });
   });
 };
 
-// Dersleri CSV dosyasından yükleme
 const loadDersler = () => {
   return new Promise((resolve, reject) => {
     const dersler = [];
@@ -53,7 +49,6 @@ const loadDersler = () => {
   });
 };
 
-// Hocaları CSV dosyasından yükleme
 const loadHocalar = () => {
   return new Promise((resolve, reject) => {
     const hocalar = [];
@@ -72,29 +67,25 @@ const loadHocalar = () => {
   });
 };
 
-// Atanmış derslerin ve hocaların listesini al
 const getAssignedData = () => {
   return new Promise((resolve, reject) => {
     const assignmentFilePath = path.join(__dirname, 'data', 'assignment.csv');
     const assignedData = [];
 
     fs.createReadStream(assignmentFilePath)
-      .pipe(csv())
+      .pipe(csv({ headers: ['dersId', 'hocaId'], skipLines: 1 }))
       .on('data', (row) => {
         assignedData.push(row);
       })
       .on('end', () => {
-        console.log('Assigned data retrieved from assignment.csv');
         resolve(assignedData);
       })
       .on('error', (err) => {
-        console.error('Error processing assignment.csv:', err);
         reject(err);
       });
   });
 };
 
-// Load dersler and hocalar once and store them globally
 let globalUsers = [];
 let globalDersler = [];
 let globalHocalar = [];
@@ -119,34 +110,31 @@ Promise.all([loadUsers(), loadDersler(), loadHocalar()])
       res.json({ token });
     });
 
-    // Endpoint to get dersler
     app.get('/api/dersler', (req, res) => {
       res.json(globalDersler);
     });
 
-    // Endpoint to get hocalar
     app.get('/api/hocalar', (req, res) => {
       res.json(globalHocalar);
     });
 
-    // Endpoint to assign ders to hoca
     app.post('/api/ata', (req, res) => {
       const { dersId, hocaId } = req.body;
       const assignmentFilePath = path.join(__dirname, 'data', 'assignment.csv');
       const assignments = [];
 
       fs.createReadStream(assignmentFilePath)
-        .pipe(csv())
+        .pipe(csv({ headers: ['dersId', 'hocaId'], skipLines: 1 }))
         .on('data', (row) => {
           assignments.push(row);
         })
         .on('end', () => {
-          const assignmentsForHoca = assignments.filter(assignment => Object.values(assignment)[0] === hocaId);
+          const assignmentsForHoca = assignments.filter(assignment => assignment.hocaId === hocaId);
           if (assignmentsForHoca.length >= 6) {
             return res.status(400).json({ message: 'Bu öğretim elemanına maksimum ders ataması yapılmış.' });
           }
 
-          const existingAssignment = assignments.find(assignment => Object.keys(assignment)[0] === dersId);
+          const existingAssignment = assignments.find(assignment => assignment.dersId === dersId);
           if (existingAssignment) {
             return res.status(400).json({ message: 'Bu ders zaten bir öğretim elemanına atanmış.' });
           }
@@ -168,11 +156,11 @@ Promise.all([loadUsers(), loadDersler(), loadHocalar()])
       getAssignedData()
         .then(assignments => {
           const data = assignments.map(assignment => {
-            const dersId = Object.keys(assignment)[0];
-            const hocaId = Object.values(assignment)[0];
-            const ders = globalDersler.find(ders => ders.ders_id === dersId);
-            const hoca = globalHocalar.find(hoca => hoca.hoca_id === hocaId);
-            return { dersName: ders ? ders.name : undefined, hocaName: hoca ? hoca.name : undefined };
+            const dersId = assignment.dersId;
+            const hocaId = assignment.hocaId;
+            const ders = globalDersler.find(ders => ders.ders_id.toString() === dersId);
+            const hoca = globalHocalar.find(hoca => hoca.hoca_id.toString() === hocaId);
+            return { dersName: ders ? ders.name : 'Bilinmiyor', hocaName: hoca ? hoca.name : 'Bilinmiyor' };
           });
           res.json(data);
         })
