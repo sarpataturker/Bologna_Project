@@ -1,44 +1,63 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const OgrenimCiktilari = () => {
-  const [dersId, setDersId] = useState('');
+  const [ciktilar, setCiktilar] = useState([]);
+  const [selectedDers, setSelectedDers] = useState('');
   const [cikti, setCikti] = useState('');
-  const [message, setMessage] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    fetchCiktilar();
+  }, []);
+
+  const fetchCiktilar = async () => {
     try {
-      await axios.post('http://localhost:5001/api/cikti', { dersId, cikti });
-      setMessage('Öğrenim çıktısı başarıyla eklendi');
+      const response = await axios.get('http://localhost:5001/api/ogrenim-ciktilari');
+      setCiktilar(response.data);
     } catch (error) {
-      setMessage('Öğrenim çıktısı eklenirken bir hata oluştu');
+      console.error('Çıktılar yüklenemedi:', error);
+    }
+  };
+
+  const handleDersChange = (event) => {
+    setSelectedDers(event.target.value);
+  };
+
+  const handleCiktiChange = (event) => {
+    setCikti(event.target.value);
+  };
+
+  const handleCiktiKaydet = async () => {
+    try {
+      await axios.post('http://localhost:5001/api/ogrenim-cikti-kaydet', { dersId: selectedDers, cikti });
+      fetchCiktilar(); // Çıktıları yeniden yükle
+    } catch (error) {
+      console.error('Çıktı kaydedilemedi:', error);
     }
   };
 
   return (
     <div>
-      <h2>Öğrenim Çıktısı Ekle</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Ders ID:</label>
-          <input
-            type="text"
-            value={dersId}
-            onChange={(e) => setDersId(e.target.value)}
-          />
-        </div>
-        <div>
-          <label>Öğrenim Çıktısı:</label>
-          <input
-            type="text"
-            value={cikti}
-            onChange={(e) => setCikti(e.target.value)}
-          />
-        </div>
-        <button type="submit">Ekle</button>
-      </form>
-      {message && <p>{message}</p>}
+      <h2>Öğrenim Çıktıları</h2>
+      <div>
+        <h3>Öğrenim Çıktısı Ekle</h3>
+        <select onChange={handleDersChange} value={selectedDers}>
+          <option value="">Ders Seçiniz</option>
+          {ciktilar.map((ders) => (
+            <option key={ders.dersId} value={ders.dersId}>{ders.dersId}</option>
+          ))}
+        </select>
+        <textarea onChange={handleCiktiChange} value={cikti} placeholder="Öğrenim çıktısı giriniz" />
+        <button onClick={handleCiktiKaydet}>Kaydet</button>
+      </div>
+      <div>
+        <h3>Öğrenim Çıktıları</h3>
+        <ul>
+          {ciktilar.map((cikti, index) => (
+            <li key={index}>{cikti.dersId}: {cikti.cikti}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };

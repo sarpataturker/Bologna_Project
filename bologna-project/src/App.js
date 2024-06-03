@@ -4,10 +4,9 @@ import Home from './pages/Home';
 import Login from './components/Login';
 import DersAtama from './components/DersAtama';
 import DersIcerigi from './components/DersIcerigi';
+import KaynakKitap from './components/KaynakKitap';
+import OgrenimCiktilari from './components/OgrenimCiktilari';
 import Header from './components/Header';
-import DersIcerikleriGoruntule from './components/DersIcerikleriGoruntule';
-import KaynakKitaplarGoruntule from './components/KaynakKitaplarGoruntule';
-import OgrenimCiktilariGoruntule from './components/OgrenimCiktilariGoruntule';
 
 const App = () => {
   return (
@@ -18,9 +17,8 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/ders-atama" element={<DersAtama />} />
         <Route path="/ders-icerigi" element={<DersIcerigi />} />
-        <Route path="/ders-icerikleri" element={<DersIcerikleriGoruntule />} />
-        <Route path="/kaynak-kitaplar" element={<KaynakKitaplarGoruntule />} />
-        <Route path="/ogrenim-ciktilari" element={<OgrenimCiktilariGoruntule />} />
+        <Route path="/kaynak-kitaplar" element={<KaynakKitap />} />
+        <Route path="/ogrenim-ciktilari" element={<OgrenimCiktilari />} />
       </Routes>
     </Router>
   );

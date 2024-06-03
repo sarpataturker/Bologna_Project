@@ -1,29 +1,17 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
-  const navigate = useNavigate();
-  const token = localStorage.getItem('token');
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
-  };
-
   return (
     <header>
       <nav>
         <ul>
-          <li><Link to="/">Home</Link></li>
-          {token ? (
-            <>
-              <li><Link to="/ders-atama">Ders Atama</Link></li>
-              <li><Link to="/ders-icerigi">Ders İçeriği</Link></li>
-              <li><button onClick={handleLogout}>Logout</button></li>
-            </>
-          ) : (
-            <li><Link to="/login">Login</Link></li>
-          )}
+          <li><Link to="/">Anasayfa</Link></li>
+          <li><Link to="/ders-atama">Ders Atama</Link></li>
+          <li><Link to="/ders-icerigi">Ders İçeriği</Link></li>
+          <li><Link to="/kaynak-kitaplar">Kaynak Kitaplar</Link></li>
+          <li><Link to="/ogrenim-ciktilari">Öğrenim Çıktıları</Link></li>
+          <li><Link to="/login">Giriş Yap</Link></li>
         </ul>
       </nav>
     </header>

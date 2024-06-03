@@ -13,7 +13,7 @@ const KaynakKitaplarGoruntule = () => {
       const response = await axios.get('http://localhost:5001/api/kitap');
       setKitaplar(response.data);
     } catch (error) {
-      console.error('Kaynak kitaplar yüklenemedi:', error);
+      console.error('Kitaplar yüklenemedi:', error);
     }
   };
 
@@ -23,8 +23,8 @@ const KaynakKitaplarGoruntule = () => {
       <table>
         <thead>
           <tr>
-            <th>Ders ID</th>
-            <th>Kaynak Kitap</th>
+            <th>Ders Adı</th>
+            <th>Kitap</th>
           </tr>
         </thead>
         <tbody>

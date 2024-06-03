@@ -100,14 +100,16 @@ Promise.all([loadUsers(), loadDersler(), loadHocalar()])
       const { tc, password } = req.body;
       const user = globalUsers.find(user => user.tc === tc);
       if (!user) {
+        console.log('User not found');
         return res.status(400).json({ message: 'User not found' });
       }
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
+        console.log('Invalid credentials');
         return res.status(400).json({ message: 'Invalid credentials' });
       }
       const token = jwt.sign({ tc: user.tc, role: user.role }, 'your_jwt_secret', { expiresIn: '1h' });
-      res.json({ token });
+      res.json({ token, role: user.role });
     });
 
     app.get('/api/dersler', (req, res) => {
@@ -187,44 +189,81 @@ Promise.all([loadUsers(), loadDersler(), loadHocalar()])
     });
 
     // Ders içeriği kaydetme
-app.post('/api/ders-icerigi-kaydet', (req, res) => {
-  const { dersId, icerik } = req.body;
-  const filePath = path.join(__dirname, 'data', 'icerik.csv');
-  fs.appendFile(filePath, `${dersId},${icerik}\n`, (err) => {
-    if (err) {
-      res.status(500).json({ message: 'İçerik kaydedilirken bir hata oluştu.' });
-    } else {
-      res.status(200).json({ message: 'İçerik başarıyla kaydedildi.' });
-    }
-  });
-});
+    app.post('/api/ders-icerigi-kaydet', (req, res) => {
+      const { dersId, icerik } = req.body;
+      const filePath = path.join(__dirname, 'data', 'icerik.csv');
+      fs.appendFile(filePath, `${dersId},${icerik}\n`, (err) => {
+        if (err) {
+          res.status(500).json({ message: 'İçerik kaydedilirken bir hata oluştu.' });
+        } else {
+          res.status(200).json({ message: 'İçerik başarıyla kaydedildi.' });
+        }
+      });
+    });
 
-// Kaynak kitap kaydetme
-app.post('/api/kaynak-kitap-kaydet', (req, res) => {
-  const { dersId, kitap } = req.body;
-  const filePath = path.join(__dirname, 'data', 'kitap.csv');
-  fs.appendFile(filePath, `${dersId},${kitap}\n`, (err) => {
-    if (err) {
-      res.status(500).json({ message: 'Kitap kaydedilirken bir hata oluştu.' });
-    } else {
-      res.status(200).json({ message: 'Kitap başarıyla kaydedildi.' });
-    }
-  });
-});
+    // Kaynak kitap kaydetme
+    app.post('/api/kaynak-kitap-kaydet', (req, res) => {
+      const { dersId, kitap } = req.body;
+      const filePath = path.join(__dirname, 'data', 'kitap.csv');
+      fs.appendFile(filePath, `${dersId},${kitap}\n`, (err) => {
+        if (err) {
+          res.status(500).json({ message: 'Kitap kaydedilirken bir hata oluştu.' });
+        } else {
+          res.status(200).json({ message: 'Kitap başarıyla kaydedildi.' });
+        }
+      });
+    });
 
-// Öğrenim çıktısı kaydetme
-app.post('/api/ogrenim-cikti-kaydet', (req, res) => {
-  const { dersId, cikti } = req.body;
-  const filePath = path.join(__dirname, 'data', 'cikti.csv');
-  fs.appendFile(filePath, `${dersId},${cikti}\n`, (err) => {
-    if (err) {
-      res.status(500).json({ message: 'Öğrenim çıktısı kaydedilirken bir hata oluştu.' });
-    } else {
-      res.status(200).json({ message: 'Öğrenim çıktısı başarıyla kaydedildi.' });
-    }
-  });
-});
-    
+    // Öğrenim çıktısı kaydetme
+    app.post('/api/ogrenim-cikti-kaydet', (req, res) => {
+      const { dersId, cikti } = req.body;
+      const filePath = path.join(__dirname, 'data', 'cikti.csv');
+      fs.appendFile(filePath, `${dersId},${cikti}\n`, (err) => {
+        if (err) {
+          res.status(500).json({ message: 'Öğrenim çıktısı kaydedilirken bir hata oluştu.' });
+        } else {
+          res.status(200).json({ message: 'Öğrenim çıktısı başarıyla kaydedildi.' });
+        }
+      });
+    });
+
+    // Kaynak kitapları görüntüleme
+    app.get('/api/kaynak-kitaplar', (req, res) => {
+      const kitapFilePath = path.join(__dirname, 'data', 'kitap.csv');
+      const kitaplar = [];
+
+      fs.createReadStream(kitapFilePath)
+        .pipe(csv({ headers: ['dersId', 'kitap'], skipLines: 1 }))
+        .on('data', (row) => {
+          kitaplar.push(row);
+        })
+        .on('end', () => {
+          res.json(kitaplar);
+        })
+        .on('error', (err) => {
+          res.status(500).json({ message: 'Kitaplar alınırken bir hata oluştu.' });
+        });
+    });
+
+    // Öğrenim çıktıları görüntüleme
+    app.get('/api/ogrenim-ciktilari', (req, res) => {
+      const ciktiFilePath = path.join(__dirname, 'data', 'cikti.csv');
+      const ciktilar = [];
+
+      fs.createReadStream(ciktiFilePath)
+        .pipe(csv({ headers: ['dersId', 'cikti'], skipLines: 1 }))
+        .on('data', (row) => {
+          ciktilar.push(row);
+        })
+        .on('end', () => {
+          res.json(ciktilar);
+        })
+        .on('error', (err) => {
+          res.status(500).json({ message: 'Öğrenim çıktıları alınırken bir hata oluştu.' });
+        });
+    });
+
+    // Server'ı başlat
     app.listen(port, () => {
       console.log(`Server http://localhost:${port} adresinde çalışıyor`);
     });

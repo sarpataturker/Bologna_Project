@@ -13,7 +13,7 @@ const OgrenimCiktilariGoruntule = () => {
       const response = await axios.get('http://localhost:5001/api/cikti');
       setCiktilar(response.data);
     } catch (error) {
-      console.error('Öğrenim çıktıları yüklenemedi:', error);
+      console.error('Çıktılar yüklenemedi:', error);
     }
   };
 
@@ -23,8 +23,8 @@ const OgrenimCiktilariGoruntule = () => {
       <table>
         <thead>
           <tr>
-            <th>Ders ID</th>
-            <th>Öğrenim Çıktısı</th>
+            <th>Ders Adı</th>
+            <th>Çıktı</th>
           </tr>
         </thead>
         <tbody>

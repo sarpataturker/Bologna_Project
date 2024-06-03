@@ -2,58 +2,63 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const DersIcerigi = () => {
-  const [dersler, setDersler] = useState([]);
+  const [icerikler, setIcerikler] = useState([]);
   const [selectedDers, setSelectedDers] = useState('');
   const [icerik, setIcerik] = useState('');
-  const [kitap, setKitap] = useState('');
-  const [cikti, setCikti] = useState('');
 
   useEffect(() => {
-    // Burada öğretmene atanmış dersleri çekebiliriz.
-    const fetchDersler = async () => {
-      const response = await axios.get('http://localhost:5001/api/atanan-dersler');
-      setDersler(response.data);
-    };
-
-    fetchDersler();
+    fetchIcerikler();
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const fetchIcerikler = async () => {
     try {
-      await axios.post('http://localhost:5001/api/ders-icerigi-kaydet', { dersId: selectedDers, icerik, kitap, cikti });
-      alert('İçerik başarıyla kaydedildi!');
+      const response = await axios.get('http://localhost:5001/api/icerik');
+      setIcerikler(response.data);
     } catch (error) {
-      console.error('İçerik kaydedilirken bir hata oluştu:', error);
-      alert('İçerik kaydedilirken bir hata oluştu!');
+      console.error('İçerikler yüklenemedi:', error);
+    }
+  };
+
+  const handleDersChange = (event) => {
+    setSelectedDers(event.target.value);
+  };
+
+  const handleIcerikChange = (event) => {
+    setIcerik(event.target.value);
+  };
+
+  const handleIcerikKaydet = async () => {
+    try {
+      await axios.post('http://localhost:5001/api/ders-icerigi-kaydet', { dersId: selectedDers, icerik });
+      fetchIcerikler(); // İçerikleri yeniden yükle
+    } catch (error) {
+      console.error('İçerik kaydedilemedi:', error);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <div>
+      <h2>Ders İçeriği</h2>
       <div>
-        <label>Ders Seç:</label>
-        <select value={selectedDers} onChange={(e) => setSelectedDers(e.target.value)}>
+        <h3>İçerik Ekle</h3>
+        <select onChange={handleDersChange} value={selectedDers}>
           <option value="">Ders Seçiniz</option>
-          {dersler.map((ders) => (
-            <option key={ders.ders_id} value={ders.ders_id}>{ders.name}</option>
+          {icerikler.map((ders) => (
+            <option key={ders.dersId} value={ders.dersId}>{ders.dersId}</option>
           ))}
         </select>
+        <textarea onChange={handleIcerikChange} value={icerik} placeholder="İçerik giriniz" />
+        <button onClick={handleIcerikKaydet}>Kaydet</button>
       </div>
       <div>
-        <label>İçerik:</label>
-        <textarea value={icerik} onChange={(e) => setIcerik(e.target.value)} />
+        <h3>İçerikler</h3>
+        <ul>
+          {icerikler.map((icerik, index) => (
+            <li key={index}>{icerik.dersId}: {icerik.icerik}</li>
+          ))}
+        </ul>
       </div>
-      <div>
-        <label>Kaynak Kitap:</label>
-        <input type="text" value={kitap} onChange={(e) => setKitap(e.target.value)} />
-      </div>
-      <div>
-        <label>Öğrenim Çıktısı:</label>
-        <input type="text" value={cikti} onChange={(e) => setCikti(e.target.value)} />
-      </div>
-      <button type="submit">Kaydet</button>
-    </form>
+    </div>
   );
 };
 

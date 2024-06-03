@@ -23,7 +23,7 @@ const DersIcerikleriGoruntule = () => {
       <table>
         <thead>
           <tr>
-            <th>Ders ID</th>
+            <th>Ders Adı</th>
             <th>İçerik</th>
           </tr>
         </thead>
